@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UK Pubs Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <style>
+        #map {
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([54.0, -2.0], 6); // Centered roughly in the UK
+
+        // Add a basemap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Marker Cluster Group
+        var markers = L.markerClusterGroup();
+
+        // Fetch and load the pubs data from the JSON file
+        fetch('uk_pubs.json')
+            .then(response => response.json())
+            .then(pubs => {
+                pubs.forEach(function(pub) {
+                    var marker = L.marker([pub.lat, pub.lon]).bindPopup(`<b>${pub.name}</b>`);
+                    markers.addLayer(marker);
+                });
+                map.addLayer(markers);
+            })
+            .catch(error => console.error('Error loading pubs data:', error));
+    </script>
+</body>
+</html>
